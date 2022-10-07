@@ -150,12 +150,12 @@ function logDone(exportName) {
 
 // creating file
 function createFile(name) {
-    fs.open(name, 'w', () => {});
+    fs.open('/usr/src/app/download/' + name, 'w', () => {});
 }
 
 // deleting file
 function deleteFile(name) {
-    fs.unlink(name, () => {});
+    fs.unlink('/usr/src/app/download/' + name, () => {});
 }
 
 main()
