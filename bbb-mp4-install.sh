@@ -32,6 +32,6 @@ else
 fi
 
 #Pulling Docker image.
-echo "Pulling Docker image  manishkatyan/bbb-mp4"
+echo "Pulling Docker image danilka1337/bbb-mp4:v0.1.FHD"
 docker pull danilka1337/bbb-mp4:v0.1.FHD
 

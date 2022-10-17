@@ -10,6 +10,7 @@ ffmpeg -y -nostats -draw_mouse 0 -s $DISPLAY_SIZE \
 	-framerate 30 \
 	-f x11grab -thread_queue_size 1024 \
 	-grab_y $Y_OFFSET \
+	-grab_x 9 \
 	-i :$DISPLAY_NUMBER \
 	-f alsa -thread_queue_size 1024 \
 	-itsoffset 0.57 \
