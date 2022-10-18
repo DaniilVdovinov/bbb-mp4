@@ -10,12 +10,16 @@ const height = 1080;
 // ~60px at 1920x1080
 const chromeInfoBarHeight = 60;
 
+// to avoid dark line at the left of screen
+// ~60px at 1920x1080
+const leftDarkLineWidth = 10;
+
 // Generate random display port number to avoid xvfb failure
 const disp_num = Math.floor(Math.random() * (200 - 99) + 99);
 const xvfb = new Xvfb({
     displayNum: disp_num,
     silent: true,
-    xvfb_args: ["-screen", "0", `${width}x${height + chromeInfoBarHeight}x24`, "-ac", "-nolisten", "tcp", "-dpi", "192", "+extension", "RANDR"]
+    xvfb_args: ["-screen", "0", `${width + leftDarkLineWidth}x${height + chromeInfoBarHeight}x24`, "-ac", "-nolisten", "tcp", "-dpi", "192", "+extension", "RANDR"]
 });
 const options = {
     headless: false,
@@ -102,7 +106,8 @@ async function main() {
             `${exportName}`, ' ',
             `${disp_num}`, ' ',
             `${width}x${height}`, ' ',
-            `${chromeInfoBarHeight}`
+            `${chromeInfoBarHeight}`, ' ',
+            `${leftDarkLineWidth}`
         ], {
             shell: true
         });
