@@ -44,6 +44,7 @@ async function main() {
     try {
 
         if (!allowParallelRecordingsRun) {
+            console.log("Waiting others recordings to finish");
             await sleepUtilNoOtherRecordingsRun();
         }
 
@@ -198,9 +199,7 @@ function countStartFilesInFolder() {
 
 // min and max included
 function randomIntFromInterval(min, max) {
-    let ms = Math.floor(Math.random() * (max - min + 1) + min);
-    console.log(ms);
-    return ms;
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 main();
