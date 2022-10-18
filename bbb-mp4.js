@@ -3,16 +3,20 @@ const child_process = require('child_process');
 const Xvfb = require('xvfb');
 const fs = require("fs");
 
+
+// ----------- Video settings -----------
 const width = 1920;
 const height = 1080;
 
-// to avoid annoying chrome "automated testing" info bar
-// ~60px at 1920x1080
+// to avoid annoying chrome "automated testing" info bar. ~60px at 1920x1080
 const chromeInfoBarHeight = 60;
 
-// to avoid dark line at the left of screen
-// ~60px at 1920x1080
+// to avoid dark line at the left of screen. ~60px at 1920x1080
 const leftDarkLineWidth = 10;
+
+// ---------- Execution settings ----------
+const allowParallelRecordingsRun = false;
+const recordingsFolder = '/usr/src/app/download/';
 
 // Generate random display port number to avoid xvfb failure
 const disp_num = Math.floor(Math.random() * (200 - 99) + 99);
@@ -38,6 +42,11 @@ let exportName;
 async function main() {
     let browser, page;
     try {
+
+        if (!allowParallelRecordingsRun) {
+            await sleepUtilNoOtherRecordingsRun();
+        }
+
         xvfb.startSync()
 
         const url = process.argv[2];
@@ -155,12 +164,43 @@ function logDone(exportName) {
 
 // creating file
 function createFile(name) {
-    fs.open('/usr/src/app/download/' + name, 'w', () => {});
+    fs.open(recordingsFolder + name, 'w', () => {});
 }
 
 // deleting file
 function deleteFile(name) {
-    fs.unlink('/usr/src/app/download/' + name, () => {});
+    fs.unlink(recordingsFolder + name, () => {});
 }
 
-main()
+
+async function sleepUtilNoOtherRecordingsRun() {
+    while (true) {
+        if (countStartFilesInFolder() === 0) {
+            break;
+        } else {
+            await sleep(randomIntFromInterval(1000, 3000));
+        }
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
+
+function countStartFilesInFolder() {
+    // count of files in folder that indicates recordings
+    return fs.readdirSync(recordingsFolder)
+        .filter(file => file.endsWith('.start'))
+        .length;
+}
+
+// min and max included
+function randomIntFromInterval(min, max) {
+    let ms = Math.floor(Math.random() * (max - min + 1) + min);
+    console.log(ms);
+    return ms;
+}
+
+main();
