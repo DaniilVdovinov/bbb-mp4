@@ -14,7 +14,6 @@ ffmpeg -y -nostats -draw_mouse 0 -s $DISPLAY_SIZE \
 	-grab_x $X_OFFSET \
 	-i :$DISPLAY_NUMBER \
 	-f alsa -thread_queue_size 1024 \
-	-itsoffset 0.57 \
 	-i pulse -ac 2 \
 	-c:v libx264 -c:a aac  \
 	-crf 22  \
