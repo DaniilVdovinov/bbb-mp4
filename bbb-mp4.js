@@ -38,6 +38,10 @@ const options = {
 };
 options.executablePath = "/usr/bin/google-chrome"
 let exportName;
+let logFileStream;
+
+console.log = logFunction;
+console.error = logFunction;
 
 async function main() {
     let browser, page;
@@ -150,27 +154,15 @@ async function main() {
 }
 
 function logStart(exportName) {
-    createFile(exportName + '.start')
+    logFileStream = fs.createWriteStream(exportName + '.start', {flags: 'a'});
 }
 
 function logError(exportName) {
-    deleteFile(exportName + '.start')
-    createFile(exportName + '.error')
+    fs.renameSync(exportName + '.start', exportName + '.error');
 }
 
 function logDone(exportName) {
-    deleteFile(exportName + '.start')
-    createFile(exportName + '.done')
-}
-
-// creating file
-function createFile(name) {
-    fs.open(recordingsFolder + name, 'w', () => {});
-}
-
-// deleting file
-function deleteFile(name) {
-    fs.unlink(recordingsFolder + name, () => {});
+    fs.renameSync(exportName + '.start', exportName + '.done');
 }
 
 
@@ -200,6 +192,13 @@ function countStartFilesInFolder() {
 // min and max included
 function randomIntFromInterval(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function logFunction(d) {
+    logFileStream
+        .write(d + '\n');
+    process.stdout
+        .write(d + '\n');
 }
 
 main();
