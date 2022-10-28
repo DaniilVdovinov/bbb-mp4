@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const child_process = require('child_process');
 const Xvfb = require('xvfb');
 const fs = require("fs");
+const {randomUUID} = require('crypto');
 
 
 // ----------- Video settings -----------
@@ -44,6 +45,7 @@ console.log = logFunction;
 console.error = logFunction;
 
 async function main() {
+    let tempLogFilename = initLog();
     let browser, page;
     try {
 
@@ -70,6 +72,7 @@ async function main() {
         // Set exportName
         exportName = new URL(url).pathname.split("/")[4];
 
+        fs.renameSync(recordingsFolder + tempLogFilename, recordingsFolder + exportName + '.start');
         logStart(exportName);
 
         browser = await puppeteer.launch(options)
@@ -153,16 +156,22 @@ async function main() {
     }
 }
 
+function initLog() {
+    let uuidFileName = randomUUID();
+    logFileStream = fs.createWriteStream(recordingsFolder + uuidFileName, {flags: 'a'})
+    return uuidFileName;
+}
+
 function logStart(exportName) {
-    logFileStream = fs.createWriteStream(exportName + '.start', {flags: 'a'});
+    logFileStream = fs.createWriteStream(recordingsFolder + exportName + '.start', {flags: 'a'});
 }
 
 function logError(exportName) {
-    fs.renameSync(exportName + '.start', exportName + '.error');
+    fs.renameSync(recordingsFolder + exportName + '.start', recordingsFolder + exportName + '.error');
 }
 
 function logDone(exportName) {
-    fs.renameSync(exportName + '.start', exportName + '.done');
+    fs.renameSync(recordingsFolder + exportName + '.start', recordingsFolder + exportName + '.done');
 }
 
 
