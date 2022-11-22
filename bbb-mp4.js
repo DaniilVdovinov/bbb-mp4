@@ -104,6 +104,8 @@ async function main() {
             console.log("Recording found")
         }
 
+        // Wait for duration on page
+        await page.waitForTimeout(5 * 1000)
         // Get recording duration
         const duration = await page.evaluate(() => {
             return document.getElementById("vjs_video_3_html5_api").duration
