@@ -83,6 +83,9 @@ async function main() {
             console.log('PAGE LOG:', msg.text()) // uncomment if you need
         });
 
+        // Wait for duration on page
+        await page.waitForTimeout(10 * 1000)
+        
         await page._client.send('Emulation.clearDeviceMetricsOverride')
         // Catch URL unreachable error
         await page.goto(url, {waitUntil: 'networkidle2'}).catch(e => {
@@ -92,7 +95,7 @@ async function main() {
         await page.setBypassCSP(true)
 
         // Check if recording exists (search "404" message)
-        await page.waitForTimeout(5 * 1000)
+        await page.waitForTimeout(10 * 1000)
         try {
             const loadMsg = await page.$eval('.error-code', el => el.textContent);
             console.log(loadMsg)
@@ -105,7 +108,7 @@ async function main() {
         }
 
         // Wait for duration on page
-        await page.waitForTimeout(5 * 1000)
+        await page.waitForTimeout(10 * 1000)
         // Get recording duration
         const duration = await page.evaluate(() => {
             return document.getElementById("vjs_video_3_html5_api").duration
