@@ -35,7 +35,7 @@ COPY *.js ./
 COPY *.json ./
 COPY .env ./
 
-RUN mkdir processing processed
+RUN mkdir download
 
 #Install npm scripts
 RUN npm install npm@latest -g
