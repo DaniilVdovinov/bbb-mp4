@@ -38,6 +38,7 @@ const options = {
     ],
 };
 options.executablePath = "/usr/bin/google-chrome"
+
 let exportName;
 let logFileStream;
 
@@ -47,8 +48,8 @@ console.error = logFunction;
 async function main() {
     let tempLogFilename = initLog();
     let browser, page;
-    try {
 
+    try {
         if (!allowParallelRecordingsRun) {
             console.log("Waiting others recordings to finish");
             await sleepUtilNoOtherRecordingsRun();
@@ -61,6 +62,7 @@ async function main() {
             console.warn('URL undefined!');
             process.exit(1);
         }
+
         // Validate URL 
         const urlRegex = new RegExp('^https?:\\/\\/.*\\/playback\\/presentation\\/2\\.3\\/[a-z0-9]{40}-[0-9]{13}');
         if (!urlRegex.test(url)) {
@@ -75,6 +77,9 @@ async function main() {
         fs.renameSync(recordingsFolder + tempLogFilename, recordingsFolder + exportName + '.start');
         logStart(exportName);
 
+        // set duration to 0
+        let duration = 0;
+
         browser = await puppeteer.launch(options)
         const pages = await browser.pages()
         page = pages[0]
@@ -85,8 +90,9 @@ async function main() {
 
         // Wait for duration on page
         await page.waitForTimeout(10 * 1000)
-        
+
         await page._client.send('Emulation.clearDeviceMetricsOverride')
+
         // Catch URL unreachable error
         await page.goto(url, {waitUntil: 'networkidle2'}).catch(e => {
             console.error('Recording URL unreachable!');
@@ -96,6 +102,7 @@ async function main() {
 
         // Check if recording exists (search "404" message)
         await page.waitForTimeout(10 * 1000)
+
         try {
             const loadMsg = await page.$eval('.error-code', el => el.textContent);
             console.log(loadMsg)
@@ -110,7 +117,7 @@ async function main() {
         // Wait for duration on page
         await page.waitForTimeout(10 * 1000)
         // Get recording duration
-        const duration = await page.evaluate(() => {
+        duration = await page.evaluate(() => {
             return document.getElementById("vjs_video_3_html5_api").duration
         });
         console.log(duration)
@@ -147,6 +154,7 @@ async function main() {
         });
 
         await page.waitFor((duration * 1000))
+
         logDone(exportName);
     } catch (err) {
         console.log(err)
@@ -178,7 +186,6 @@ function logError(exportName) {
 function logDone(exportName) {
     fs.renameSync(recordingsFolder + exportName + '.start', recordingsFolder + exportName + '.done');
 }
-
 
 async function sleepUtilNoOtherRecordingsRun() {
     while (true) {
